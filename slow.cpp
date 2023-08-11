@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <cstdio>
 #include <cassert>
+#include <string>
 #include "primes.h"
 
 char* get_jmp_addr(char* jump_base, uint32_t i) {
@@ -13,10 +14,17 @@ char* get_target_addr(char* target_base, uint32_t i) {
     return target_base + (i * 8);
 }
 
-int main() {
+int main(int argc, char** argv) {
+
+    if (argc != 2) {
+        printf("Usage: %s <approx_shfit>\n", argv[0]);
+        return 1;
+    }
+
+    uint32_t approx_shift = std::stoi(argv[1]);
 
     printf("Generating permutation...\n");
-    auto perm = generate_cyclic_permutation(1 << 26, 100'000);
+    auto perm = generate_cyclic_permutation(1 << 26, approx_shift);
 
     // Allocate the instruction and target buffers
     const size_t size = 1ULL << 30;
@@ -51,6 +59,7 @@ int main() {
         assert((uintptr_t)nextJ <= (1 << 31));
         *(uint32_t*)T = (uint32_t)(uintptr_t)nextJ;
 
+        // jmp *(Ti) = 0xff 0x24 0x25 (Ti)
         J[0] = 0xff;
         J[1] = 0x24;
         J[2] = 0x25;
