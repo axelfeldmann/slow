@@ -8,7 +8,7 @@ CXX = g++
 CXXFLAGS = -fpermissive -g
 
 # Source files
-SOURCES = slow.cpp
+SOURCES = slow.cpp primes.cpp
 
 # Make rules
 
