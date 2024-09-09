@@ -4,8 +4,8 @@ This code is designed to achieve very high cycles-per-instruction (CPI) on an x8
 machine. The basic rules of the challenge are
 
 * single threaded code
-* user space only
-* no virtual machines
+* the CPU must *actively* be executing instructions
+* "on-device" only... no waiting for IO from another machine
 * CPI is measured by `perf stat`
 
 No, this is not actually useful in any way.
@@ -75,11 +75,51 @@ and well-chosen.
 ### Measurement
 
 Once the program starts running, it will print out it's PID. You can then
-run `./perf.py <PID>` to measure the CPI. Run `./perf.py` for a little while then
-ctrl-C it to see the reported CPI.
+run 
+```
+perf stat -e cycles,instructions -I 1000 -p <pid>
+```
+to see values for `cycles` and `instructions` ever second.
+
+On my machine (a AMD EPYC 7763 64-Core Processor) it outputs numbers roughly like this:
+```
+     7.008462327      3,528,633,557      cycles
+     7.008462327          5,601,273      instructions              #    0.00  insn per cycle
+```
+
+which is ~630 CPI. Pretty high!
 
 ### Caveats
 
 * This code is extremely non-portable.
 * Higher CPI might be possibly by selecting addresses more carefully (placing all loads on 
 page boundaries, etc.) but I haven't bothered doing that.
+
+
+# The Infernal Machine: `slower.cpp`
+
+630 CPI is nice, but I think we can do even better. So, `slower.cpp` executes the same program
+as `slow.cpp`... inside of a virtual machine.
+
+Running/building this works pretty similar to `slow`, except you may need to use `sudo`
+to both run and profile the virtual machine.
+
+I use the following commands:
+```
+sudo ./slower 2345
+```
+and 
+```
+sudo perf kvm stat -e cycles,instructions -I 1000 -p <pid>
+```
+
+On my machine with AMD's hardware accelerated "nested page translation" (NPT),
+the numbers look great!
+
+```
+     7.008185293      3,516,477,735      cycles
+     7.008185293          2,687,541      instructions              #    0.00  insn per cycle
+```
+
+giving us a nice and efficient ~1308 CPI
+

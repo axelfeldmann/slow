@@ -51,12 +51,12 @@ int main(int argc, char** argv) {
         char* J = get_jmp_addr(jump_instrs, i);
         char* T = get_target_addr(jump_targets, i);
 
-        assert((uintptr_t)J <= (1 << 31));
+        assert((uintptr_t)J <= (1u << 31));
         uint32_t Ti = (uint32_t)(uintptr_t)T;
 
         char* nextJ = get_jmp_addr(jump_instrs, perm.at(i));
 
-        assert((uintptr_t)nextJ <= (1 << 31));
+        assert((uintptr_t)nextJ <= (1u << 31));
         *(uint32_t*)T = (uint32_t)(uintptr_t)nextJ;
 
         // jmp *(Ti) = 0xff 0x24 0x25 (Ti)

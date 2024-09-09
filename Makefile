@@ -1,24 +1,18 @@
-# Name of the output executable
-OUTPUT = slow
-
-# Compiler to use
 CXX = g++
+CXXFLAGS = -Wall -Werror -std=c++17
 
-# Compiler flags
-CXXFLAGS = -fpermissive -g
+SOURCES = $(wildcard *.cpp)
+OBJECTS = $(filter-out slow.o slower.o, $(SOURCES:.cpp=.o))
 
-# Source files
-SOURCES = slow.cpp primes.cpp
+all: slow slower
 
-# Make rules
+slow: slow.o $(OBJECTS)
+	$(CXX) $(CXXFLAGS) -o $@ $^
 
-# Default target
-all: $(OUTPUT)
+slower: slower.o $(OBJECTS)
+	$(CXX) $(CXXFLAGS) -o $@ $^
 
-$(OUTPUT): $(SOURCES)
-	$(CXX) $(CXXFLAGS) $(SOURCES) -o $(OUTPUT)
-
-# Clean rule to remove compiled files
 clean:
-	rm -f $(OUTPUT)
+	rm -f slow slower $(OBJECTS) slow.o slower.o
 
+.PHONY: all clean
