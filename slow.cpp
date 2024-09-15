@@ -21,10 +21,10 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    uint32_t approx_shift = std::stoi(argv[1]);
+    uint32_t shift = std::stoi(argv[1]);
 
     printf("Generating permutation...\n");
-    auto perm = generate_cyclic_permutation(1 << 26, approx_shift);
+    auto perm = generate_cyclic_permutation(1 << 26, shift);
 
     // Allocate the instruction and target buffers
     const size_t size = 1ULL << 30;
