@@ -57,9 +57,8 @@ to have poor cache locality. This way, for every `jmp *(target)` we first have a
 _loading the instruction_ followed by another cache miss when loading `target`. These
 loads all depend on each other meaning that they must be executed sequentially.
 
-To generate "low-locality" `P`s, we select `N` to be a large prime. Then, we find
-a `shift` that is a primtitive root of `N` close to the user-specified
-`approx_shift` value. This will generate a permutation that looks like:
+To generate "low-locality" `P`s, we select `N` to be a large prime and `shift` to be
+some other nonzero number.
 
 ```
 jmp[0]
